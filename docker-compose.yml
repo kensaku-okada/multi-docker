@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  # service name
+  postgres:
+    image: 'postgres:latest'
+  redis:
+    image: 'redis:latest'
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80'
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      # specify the directory that we want docker to use (== the directory of Dockerfile)
+      context: ./server
+    volumes:
+      # do not try to override this folder in the container. app directory is specified at docker-compose.yml
+      - /app/node_modules
+      # look at the local server directory and refer to everything there to app directory in container
+      - ./server:/app
+    environment:
+      - REDIS_HOST=redis
+      # source of 6379 port number: https://hub.docker.com/_/redis. 6379 is the default redis port number
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      # source of 6379 port number:  https://hub.docker.com/_/postgres
+      - PGPORT=5432
+  client:
+    build:
+      dockerfile: 'Dockerfile.dev'
+      context: './client'
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    build:
+      dockerfile: 'Dockerfile.dev'
+      context: './worker'
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+
