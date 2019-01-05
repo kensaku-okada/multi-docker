@@ -1,0 +1,28 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  # before the install step, we build the test version of client project, and run the test defied inside of it.
+  # -f: override the default dockerfile to set up the test environment, which should be the develop environment
+  # ./client: the location of build context (the project directory for the image we make)
+  - docker build -t kensakuokada/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  # run tests
+  - docker run kensakuokada/react-test npm test -- --coverage
+
+after_success:
+  # build production version of all projects
+  - docker build -t kensakuokada/multi-client ./client
+  - docker build -t kensakuokada/multi-nginx ./nginx
+  - docker build -t kensakuokada/multi-server ./server
+  - docker build -t kensakuokada/multi-worker ./worker
+  # log into the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # push the production version images to docker hub
+  -docker push kensakuokada/multi-client
+  -docker push kensakuokada/multi-nginx
+  -docker push kensakuokada/multi-server
+  -docker push kensakuokada/multi-worker
+
