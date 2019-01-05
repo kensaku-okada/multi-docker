@@ -21,8 +21,8 @@ after_success:
   # log into the Docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # push the production version images to docker hub
-  -docker push kensakuokada/multi-client
-  -docker push kensakuokada/multi-nginx
-  -docker push kensakuokada/multi-server
-  -docker push kensakuokada/multi-worker
+  - docker push kensakuokada/multi-client
+  - docker push kensakuokada/multi-nginx
+  - docker push kensakuokada/multi-server
+  - docker push kensakuokada/multi-worker
 
