@@ -8,7 +8,7 @@ RUN npm run build
 
 
 # copy over nginx.default.conf file
-FRON nginx
+FROM nginx
 # change the port number that the nginx on client listens on
 EXPOSE 3000
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
